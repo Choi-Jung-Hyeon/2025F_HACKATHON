@@ -1,4 +1,5 @@
 import { getProjects, Project } from '@/services/ProjectListService';
+import Link from 'next/link';
 import React from 'react';
 
 const Sidebar = async () => {
@@ -11,12 +12,12 @@ const Sidebar = async () => {
         <ul>
           {projects.map((project) => (
             <li key={project.id}>
-              <a 
-                href="#" 
-                className="block p-2 rounded-md hover:bg-gray-700/50 transition-colors duration-200 truncate text-sm"
+              <Link
+                key={project.id} 
+                href={`/project`}
               >
                 {project.title}
-              </a>
+              </Link>
             </li>
           ))}
         </ul>
