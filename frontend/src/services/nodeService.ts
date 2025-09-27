@@ -54,19 +54,14 @@ export const createChildNode = async (name: string, projectId: number, parentId:
 };
 
 /**
- * [추가된 함수] 여러 노드를 병합하여 새로운 노드를 생성하는 API
- * @param nodeIds 병합할 노드 ID들의 배열
- * @returns 새로 생성된 병합 노드 데이터
+ * [기존 함수] 노드 병합
  */
 export const mergeNodes = async (nodeIds: number[]): Promise<ApiNodeData> => {
     const response = await fetch(`${API_BASE_URL}/node/merge`, {
         method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(nodeIds), // 백엔드는 ID 리스트를 직접 받습니다.
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(nodeIds),
     });
-
     if(!response.ok) {
         const errorBody = await response.text();
         throw new Error(`HTTP error! status: ${response.status}, body: ${errorBody}`);
@@ -74,12 +69,31 @@ export const mergeNodes = async (nodeIds: number[]): Promise<ApiNodeData> => {
     return await response.json();
 };
 
+/**
+ * [추가된 함수] 선택된 노드들을 삭제하는 API
+ * @param nodeIds 삭제할 노드 ID들의 배열
+ */
+export const deleteNodes = async (nodeIds: number[]): Promise<void> => {
+    const response = await fetch(`${API_BASE_URL}/node/delete`, {
+        method: 'POST', // API 명세에 따라 POST
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(nodeIds),
+    });
+
+    if(!response.ok) {
+        const errorBody = await response.text();
+        throw new Error(`HTTP error! status: ${response.status}, body: ${errorBody}`);
+    }
+    // 성공 시 반환값이 없으므로, 여기서 종료
+};
+
 
 /**
  * [기존 함수] 메모 저장
  */
 export const saveMemo = async (nodeId: number, content: string): Promise<ApiMemoData> => {
-  // ... (이전 코드와 동일)
   const response = await fetch(`${API_BASE_URL}/memo`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -93,7 +107,6 @@ export const saveMemo = async (nodeId: number, content: string): Promise<ApiMemo
  * [기존 함수] AI 아이디어 제안 요청
  */
 export const getAiSuggestion = async (nodeId: number): Promise<ApiSuggestionData> => {
-  // ... (이전 코드와 동일)
   const response = await fetch(`${API_BASE_URL}/memo/suppose/${nodeId}`, {
     method: 'GET',
   });

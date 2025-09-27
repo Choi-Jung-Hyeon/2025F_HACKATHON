@@ -14,8 +14,7 @@ import ReactFlow, {
   addEdge,
 } from 'reactflow';
 import 'reactflow/dist/style.css';
-
-import { toast } from "sonner"; // Sonner(Toast) import
+import { toast } from "sonner";
 
 // 컴포넌트, 서비스, 유틸리티 import
 import RootNode from './nodes/RootNode';
@@ -24,7 +23,7 @@ import TxtNode from './nodes/TxtNode';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { createInitialNodes, createChildNode, mergeNodes } from '@/services/nodeService'; // mergeNodes import
+import { createInitialNodes, createChildNode, mergeNodes, deleteNodes } from '@/services/nodeService'; // deleteNodes import
 import { convertApiToFlow } from '@/lib/flowUtils';
 
 const nodeTypes = {
@@ -43,7 +42,7 @@ export default function MindMapCanvas() {
 
   const searchParams = useSearchParams();
 
-  // 초기 노드 생성 로직
+  // [기존 로직] 초기 노드 생성
   useEffect(() => {
     const topic = searchParams.get('topic');
     if (topic && nodes.length === 0) {
@@ -62,23 +61,20 @@ export default function MindMapCanvas() {
       setIsLoading(false);
     }
   }, [searchParams, nodes.length]);
-
-  // '새 노드 추가' 핸들러
+  
+  // [기존 로직] '새 노드 추가' 핸들러
   const handleCreateNode = async () => {
+    // ... (이전 코드와 동일)
     if (!newNodeName.trim()) return alert('노드 이름을 입력하세요.');
     if (selectedNodeIds.length !== 1) return alert('부모로 지정할 노드 하나를 먼저 선택해주세요.');
-    
     const parentId = parseInt(selectedNodeIds[0]);
-    const projectId = 1; // 임시 프로젝트 ID
-
+    const projectId = 1;
     try {
       const newNodeData = await createChildNode(newNodeName, projectId, parentId);
-      
       const parentNode = nodes.find(n => n.id === String(parentId));
       const newPosition = parentNode 
         ? { x: parentNode.position.x + Math.random() * 200 - 100, y: parentNode.position.y + 150 }
         : { x: 0, y: 0 };
-
       const newNode: Node = {
         id: String(newNodeData.id),
         type: 'childNode',
@@ -90,34 +86,31 @@ export default function MindMapCanvas() {
         source: String(newNodeData.parentId),
         target: String(newNodeData.id),
       };
-
       setNodes(nds => nds.concat(newNode));
       setEdges(eds => addEdge(newEdge, eds));
       setNewNodeName('');
       setIsDialogOpen(false);
-      toast.success("새로운 노드를 추가했습니다."); // 성공 알림
+      toast.success("새로운 노드를 추가했습니다.");
     } catch (error) {
       console.error('새 노드 생성 실패:', error);
-      toast.error("노드 생성에 실패했습니다."); // 실패 알림
+      toast.error("노드 생성에 실패했습니다.");
     }
   };
 
-  // '노드 조합' 핸들러
+  // [기존 로직] '노드 조합' 핸들러
   const handleMergeNodes = async () => {
+    // ... (이전 코드와 동일)
     if (selectedNodeIds.length < 2) return;
-
     try {
       const idsToMerge = selectedNodeIds.map(id => parseInt(id));
       const newNodeData = await mergeNodes(idsToMerge);
-
       const parentNode = nodes.find(n => n.id === String(newNodeData.parentId));
       const newPosition = parentNode 
         ? { x: parentNode.position.x - 200, y: parentNode.position.y + 150 }
         : { x: 0, y: 0 };
-
       const newNode: Node = {
         id: String(newNodeData.id),
-        type: 'childNode', // 또는 API 응답에 따라
+        type: 'childNode',
         position: newPosition,
         data: { label: newNodeData.name },
       };
@@ -126,7 +119,6 @@ export default function MindMapCanvas() {
         source: String(newNodeData.parentId),
         target: String(newNodeData.id),
       };
-
       setNodes(nds => nds.concat(newNode));
       setEdges(eds => addEdge(newEdge, eds));
       toast.success("노드를 성공적으로 조합했습니다.");
@@ -135,6 +127,24 @@ export default function MindMapCanvas() {
       toast.error("노드 조합에 실패했습니다.");
     }
   };
+
+  // [추가된 로직] 노드 삭제 핸들러
+  const onNodesDelete = useCallback(async (deletedNodes: Node[]) => {
+    const idsToDelete = deletedNodes.map(node => parseInt(node.id));
+    if (idsToDelete.length === 0) return;
+
+    try {
+        await deleteNodes(idsToDelete);
+        // API 호출이 성공하면 화면에서도 노드와 엣지를 제거합니다.
+        // 백엔드에서 하위 노드까지 모두 삭제해주므로, 프런트에서는 전달된 ID만 제거하면 됩니다.
+        setNodes(nds => nds.filter(node => !idsToDelete.includes(parseInt(node.id))));
+        setEdges(eds => eds.filter(edge => !idsToDelete.includes(parseInt(edge.source)) && !idsToDelete.includes(parseInt(edge.target))));
+        toast.success("노드를 삭제했습니다.");
+    } catch (error) {
+        console.error('노드 삭제 실패:', error);
+        toast.error("노드 삭제에 실패했습니다.");
+    }
+  }, []);
 
   const onNodesChange: OnNodesChange = useCallback((changes) => setNodes((nds) => applyNodeChanges(changes, nds)), []);
   const onEdgesChange: OnEdgesChange = useCallback((changes) => setEdges((eds) => applyEdgeChanges(changes, eds)), []);
@@ -149,6 +159,7 @@ export default function MindMapCanvas() {
   return (
     <div style={{ width: '100vw', height: '100vh', position: 'relative' }}>
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+        {/* ... (Dialog UI 코드 동일) */}
         <DialogTrigger asChild>
           <Button className="absolute top-10 right-10 z-10 shadow-lg">새 노드 추가</Button>
         </DialogTrigger>
@@ -177,6 +188,7 @@ export default function MindMapCanvas() {
         onNodesChange={onNodesChange}
         onEdgesChange={onEdgesChange}
         onSelectionChange={onSelectionChange}
+        onNodesDelete={onNodesDelete} // onNodesDelete 핸들러 등록
         nodeTypes={nodeTypes}
         fitView
       >
@@ -187,7 +199,7 @@ export default function MindMapCanvas() {
       {selectedNodeIds.length > 1 && (
         <Button
           className="absolute bottom-10 right-10 z-10 shadow-lg"
-          onClick={handleMergeNodes} // 핸들러 연결
+          onClick={handleMergeNodes}
         >
           선택된 노드 조합하기
         </Button>

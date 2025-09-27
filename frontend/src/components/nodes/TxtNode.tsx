@@ -4,10 +4,11 @@ import React, { memo, useState, useEffect } from 'react';
 import { Handle, Position, NodeProps } from 'reactflow';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
-import { Lightbulb } from 'lucide-react';
-import { saveMemo, getAiSuggestion } from '@/services/nodeService'; // API 함수 import
+import { Lightbulb, Star } from 'lucide-react'; // Star 아이콘 import
+import { saveMemo, getAiSuggestion } from '@/services/nodeService';
+import { cn } from '@/lib/utils'; // cn 유틸리티 import
 
-// Debounce Hook: 타이핑이 멈춘 후 일정 시간이 지나면 함수를 실행
+// Debounce Hook (이전과 동일)
 function useDebounce(value: string, delay: number) {
   const [debouncedValue, setDebouncedValue] = useState(value);
   useEffect(() => {
@@ -25,12 +26,12 @@ function TxtNode({ id, data }: NodeProps<{ label: string }>) {
   const [memoContent, setMemoContent] = useState('');
   const [suggestion, setSuggestion] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  // '중요' 상태 추가
+  const [isImportant, setIsImportant] = useState(false);
   
-  // Debounce를 사용하여 사용자가 타이핑을 멈추면(1초 후) API 호출
   const debouncedMemo = useDebounce(memoContent, 1000);
 
   useEffect(() => {
-    // debouncedMemo가 변경될 때 (타이핑 멈춘 후) 메모 저장 API 호출
     if (debouncedMemo) {
       saveMemo(Number(id), debouncedMemo)
         .then(() => console.log(`노드 ${id}의 메모 저장 성공`))
@@ -38,7 +39,6 @@ function TxtNode({ id, data }: NodeProps<{ label: string }>) {
     }
   }, [debouncedMemo, id]);
 
-  // AI 제안 받기 버튼 핸들러
   const handleSuggestionClick = async () => {
     setIsLoading(true);
     setSuggestion('');
@@ -53,12 +53,33 @@ function TxtNode({ id, data }: NodeProps<{ label: string }>) {
     }
   };
 
+  const toggleImportance = (event: React.MouseEvent) => {
+    event.stopPropagation();
+    setIsImportant(prev => !prev);
+  };
+
   return (
-    <div className="w-72 bg-white rounded-lg shadow-lg border border-gray-200">
+    <div
+      className={cn(
+        "w-72 bg-white rounded-lg shadow-lg border transition-all duration-300",
+        // '중요' 상태일 때의 스타일
+        isImportant ? 'border-yellow-400 border-2 shadow-xl' : 'border-gray-200'
+      )}
+    >
       <Handle type="target" position={Position.Top} className="!bg-stone-500" />
       
-      <div className="p-3 bg-gray-50 rounded-t-lg border-b">
+      {/* 노드 헤더 수정 */}
+      <div className={cn(
+        "p-3 rounded-t-lg border-b flex items-center justify-between",
+        isImportant ? 'bg-yellow-50' : 'bg-gray-50'
+      )}>
         <p className="font-semibold text-gray-700">{data.label}</p>
+        <button onClick={toggleImportance} className="p-1 rounded-full hover:bg-yellow-200">
+          <Star className={cn(
+            "h-4 w-4 transition-colors",
+            isImportant ? "text-yellow-500 fill-yellow-500" : "text-gray-300"
+          )} />
+        </button>
       </div>
 
       <div className="p-3">
@@ -70,7 +91,6 @@ function TxtNode({ id, data }: NodeProps<{ label: string }>) {
         />
       </div>
 
-      {/* AI 제안 결과 표시 영역 */}
       {suggestion && (
         <div className="p-3 border-t text-sm text-gray-600 bg-yellow-50">
           <p className="font-bold mb-1 text-yellow-800">AI 제안:</p>
