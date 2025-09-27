@@ -1,8 +1,9 @@
 package com.example.my_app.llm.service;
 
+/* 
 import com.example.my_app.llm.PromptProperties;
 import jakarta.annotation.PostConstruct;
-import org.springframework.ai.chat.ChatClient;
+import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.prompt.PromptTemplate;
 import org.springframework.stereotype.Service;
 import java.util.List;
@@ -46,10 +47,9 @@ public class AIService {
         );
 
         // 1. LLM으로부터 원본 응답 문자열을 받습니다.
-        String rawResponse = chatClient.call(promptTemplate.create(variables))
-                                     .getResult()
-                                     .getOutput()
-                                     .getContent();
+        String rawResponse = chatClient.prompt(promptTemplate.create(variables))
+                                     .call()
+                                     .content();
 
         // 2. 받은 문자열을 파싱하여 List<String>으로 변환 후 반환합니다.
         return parseLlmResponseToList(rawResponse);
@@ -68,17 +68,15 @@ public class AIService {
                 "keywords", String.join(", ", keywords)
         );
 
-        String rawResponse = chatClient.call(promptTemplate.create(variables))
-                                     .getResult()
-                                     .getOutput()
-                                     .getContent();
+        String rawResponse = chatClient.prompt(promptTemplate.create(variables))
+                                     .call()
+                                     .content();
         
         return parseLlmResponseToList(rawResponse);
     }
     
-    /**
-     * LLM의 줄바꿈 응답을 String 리스트로 파싱하는 헬퍼 메소드
-     */
+    // LLM의 줄바꿈 응답을 String 리스트로 파싱하는 헬퍼 메소드
+
     private List<String> parseLlmResponseToList(String rawResponse) {
         if (rawResponse == null || rawResponse.isBlank()) {
             return List.of(); // 비어있으면 빈 리스트 반환
@@ -89,3 +87,4 @@ public class AIService {
                 .toList();                        // 4. 결과를 새로운 리스트로 만듦
     }
 }
+*/

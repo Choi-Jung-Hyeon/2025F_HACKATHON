@@ -6,7 +6,7 @@ spring:
     vertex:
       ai:
         gemini:
-          api-key: ${GEMINI_API_KEY}
+          api-key: dummy-key #${GEMINI_API_KEY}
           project-id: "gen-lang-client-0980652047" # GCP 프로젝트 ID
           location: "us-central1"
           chat:

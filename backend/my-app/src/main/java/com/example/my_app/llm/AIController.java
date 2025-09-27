@@ -1,5 +1,6 @@
 package com.example.my_app.llm;
 
+/*
 import com.example.my_app.llm.service.AIService;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -24,12 +25,13 @@ public class AIController {
     public record IdeaRequest(String mainTopic, List<String> keywords) {}
 
     @PostMapping("/generate-keywords")
-    public String generateKeywords(@RequestBody KeywordRequest request) {
+    public List<String> generateKeywords(@RequestBody KeywordRequest request) {
         return aiService.generateNewKeywords(request.mainTopic, request.keyword);
     }
 
     @PostMapping("/generate-ideas")
-    public String generateIdeas(@RequestBody IdeaRequest request) {
+    public List<String> generateIdeas(@RequestBody IdeaRequest request) {
         return aiService.generateNewIdeas(request.mainTopic, request.keywords);
     }
 }
+    */

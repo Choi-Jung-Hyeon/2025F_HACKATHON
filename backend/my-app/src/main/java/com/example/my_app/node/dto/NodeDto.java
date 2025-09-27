@@ -1,0 +1,1 @@
+public record NodeDto(Long id, String nodeText, String memoText, Boolean isActive) {}

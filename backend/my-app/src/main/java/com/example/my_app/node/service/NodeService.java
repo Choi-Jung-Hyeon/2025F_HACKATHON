@@ -11,11 +11,12 @@ import java.util.List;
 @RequiredArgsConstructor
 public class NodeService {
 
+    public record NodeDto(Long id, String nodeText, String memoText, Boolean isActive) {}
     private final NodeRepository nodeRepository;
 
     // 특정 프로젝트에 속한 노드 전체 조회
     public List<Node> getNodesByProjectId(Long projectId) {
-        return nodeRepository.findAllByProjectId(projectId);
+        return nodeRepository.findAllByProject_Id(projectId);
     }
 
     // 현재 노드의 텍스트 가져오기

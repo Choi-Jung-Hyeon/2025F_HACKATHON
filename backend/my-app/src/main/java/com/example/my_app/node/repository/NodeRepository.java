@@ -10,5 +10,7 @@ import java.util.List;
 
 @Repository
 public interface NodeRepository extends JpaRepository<Node, Long> {
-    List<Node> findAllByProjectId(Long projectsId); //test용 
+    List<Node> findAllByProject_Id(Long projectsId); //test용 
+
+
 }
