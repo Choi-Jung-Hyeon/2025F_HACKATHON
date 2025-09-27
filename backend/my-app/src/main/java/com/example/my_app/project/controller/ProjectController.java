@@ -25,7 +25,7 @@ public class ProjectController {
     }
 
 
-    @GetMapping("/api/v1/projects/{id}") // 확인 후 : 로 수정 
+    @GetMapping("/api/v1/projects/{id}") 
     public ResponseEntity<Project> getProjectById(@PathVariable Long id) {
         return projectRepository.findById(id)
                 .map(ResponseEntity::ok)
