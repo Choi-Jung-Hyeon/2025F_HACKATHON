@@ -1,4 +1,4 @@
-// 백엔드 서버의 새로운 IP 주소와 포트
+// 백엔드 서버의 IP 주소와 포트
 const API_BASE_URL = 'http://3.38.252.116:8080/api/v1';
 
 // API 응답으로 기대되는 노드 데이터의 타입 (백엔드 DB 구조 기반)
@@ -19,30 +19,42 @@ export const createInitialNodes = async (topic: string, projectId: number = 1): 
   try {
     const response = await fetch(`${API_BASE_URL}/node`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      // 백엔드 기획서에 명시된 요청 본문(body) 형식
-      body: JSON.stringify({
-        name: topic,
-        projectId: projectId, 
-      }),
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name: topic, projectId: projectId }),
     });
-
-    if (!response.ok) {
-      // 서버에서 에러 응답이 온 경우
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-
-    const data: ApiNodeData[] = await response.json();
-    return data;
+    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+    return await response.json();
   } catch (error) {
     console.error('초기 노드 생성 API 호출에 실패했습니다:', error);
-    // 에러 발생 시, 사용자에게 알리거나 대체 데이터를 반환할 수 있습니다.
-    return []; // 빈 배열 반환
+    return [];
   }
 };
 
-// --- 앞으로 이곳에 다른 API 호출 함수들을 추가하게 됩니다 ---
-// export const createChildNode = ...
-// export const mergeNodes = ...
+/**
+ * [추가된 함수] 특정 부모 아래에 새로운 자식 노드를 생성하는 API 호출 함수
+ * @param name 새로 생성할 노드의 이름
+ * @param projectId 현재 프로젝트 ID
+ * @param parentId 부모 노드의 ID
+ * @returns 생성된 새로운 노드 데이터
+ */
+export const createChildNode = async (name: string, projectId: number, parentId: number): Promise<ApiNodeData> => {
+  const response = await fetch(`${API_BASE_URL}/node`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    // 백엔드 기획서에 명시된 요청 본문(body) 형식
+    body: JSON.stringify({
+      name: name,
+      projectId: projectId,
+      parentId: parentId,
+    }),
+  });
+
+  if (!response.ok) {
+    const errorBody = await response.text();
+    throw new Error(`HTTP error! status: ${response.status}, body: ${errorBody}`);
+  }
+
+  return await response.json();
+};
