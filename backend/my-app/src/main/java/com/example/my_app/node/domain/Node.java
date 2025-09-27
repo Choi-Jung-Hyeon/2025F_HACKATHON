@@ -1,27 +1,37 @@
 package com.example.my_app.node.domain;
 
 import com.example.my_app.project.domain.Project;
-
 import jakarta.persistence.*;
+import lombok.*;
+
 import java.util.*;
 
 @Entity
+@Table(name = "node")
+@Builder
+@AllArgsConstructor
+@Getter
+@NoArgsConstructor
+@Setter
 public class Node {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;  // 노드 고유 ID
+    private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "projects_id", nullable = false)
     private Project project;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "parent_id")
-    private Node parent;  // 최상위 노드는 null
 
     @OneToMany(mappedBy = "parent", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
     private List<Node> children = new ArrayList<>();
 
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "parent_id")
+    private Node parent;
 
     @Column(name = "node_text", nullable = false)
     private String nodeText;
@@ -29,4 +39,6 @@ public class Node {
     @Column(name = "memo_text")
     private String memoText;
 
+    @Column(name = "is_active")
+    private Boolean isActive;  
 }
