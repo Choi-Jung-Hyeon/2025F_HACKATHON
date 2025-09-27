@@ -14,7 +14,7 @@ const MainContent = () => {
       alert('주제를 입력해주세요!');
       return;
     }
-    // API를 직접 호출하는 대신, 입력된 주제를 URL에 담아 canvas 페이지로 전달합니다.
+    // 입력된 주제를 쿼리 파라미터로 담아 canvas 페이지로 이동
     router.push(`/canvas?topic=${encodeURIComponent(topic)}`);
   };
 
