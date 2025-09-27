@@ -1,0 +1,32 @@
+spring:
+  profiles:
+    active: dev
+
+  ai:
+    vertex:
+      ai:
+        gemini:
+          api-key: ${GEMINI_API_KEY}
+          project-id: "gen-lang-client-0980652047" # GCP 프로젝트 ID
+          location: "us-central1"
+          chat:
+            options:
+              model: "gemini-2.5-flash" # 사용할 Gemini 모델명
+
+  datasource:
+    url: jdbc:postgresql://hack.cdyym84kq2y7.ap-northeast-2.rds.amazonaws.com:5432/hack
+    driver-class-name: org.postgresql.Driver
+    username: postgres
+    password: postgres
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+
+  h2:
+    console:
+      enabled: false

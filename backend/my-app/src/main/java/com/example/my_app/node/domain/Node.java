@@ -29,6 +29,7 @@ public class Node {
     private List<Node> children = new ArrayList<>();
 
 
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "parent_id")
     private Node parent;
