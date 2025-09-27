@@ -1,11 +1,10 @@
-// 프로젝트 데이터의 타입을 정의하면 좋습니다.
 export interface Project {
   id: number;
   title: string;
 }
 
-// API 기본 URL (환경 변수로 관리하는 것이 가장 좋습니다)
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://43.203.233.116:8080';
+// API 기본 URL
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
 /**
  * 모든 프로젝트 목록을 가져오는 함수

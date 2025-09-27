@@ -1,7 +1,25 @@
+'use client';
+
 import React from 'react';
 import TextInput from './TextInput';
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { Button } from './ui/button';
+import { Input } from './ui/input';
 
 const MainContent = () => {
+  const [topic, setTopic] = useState('');
+  const router = useRouter();
+
+  const handleStart = () => {
+    if (!topic.trim()) {
+      alert('주제를 입력해주세요!');
+      return;
+    }
+    // API를 직접 호출하는 대신, 입력된 주제를 URL에 담아 canvas 페이지로 전달합니다.
+    router.push(`/canvas?topic=${encodeURIComponent(topic)}`);
+  };
+
   return (
     <main className="flex-1 flex flex-col p-4 md:p-6">
       {/* flex-grow를 사용하여 이 컨테이너가 남은 공간을 모두 차지하게 만들어
