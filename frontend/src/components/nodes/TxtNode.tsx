@@ -4,11 +4,12 @@ import React, { memo, useState, useEffect } from 'react';
 import { Handle, Position, NodeProps } from 'reactflow';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
-import { Lightbulb, Star } from 'lucide-react'; // Star 아이콘 import
-import { saveMemo, getAiSuggestion } from '@/services/nodeService';
-import { cn } from '@/lib/utils'; // cn 유틸리티 import
+import { Lightbulb, Star } from 'lucide-react';
+import { saveMemo } from '@/services/nodeService'; // saveMemo는 실제 API를 사용하도록 유지 (테스트 가능)
+import { getAiSuggestionDummy } from '@/lib/dummyApi'; // [수정] 더미 제안 함수 import
+import { cn } from '@/lib/utils';
 
-// Debounce Hook (이전과 동일)
+// Debounce Hook (기존과 동일)
 function useDebounce(value: string, delay: number) {
   const [debouncedValue, setDebouncedValue] = useState(value);
   useEffect(() => {
@@ -26,16 +27,17 @@ function TxtNode({ id, data }: NodeProps<{ label: string }>) {
   const [memoContent, setMemoContent] = useState('');
   const [suggestion, setSuggestion] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  // '중요' 상태 추가
   const [isImportant, setIsImportant] = useState(false);
   
   const debouncedMemo = useDebounce(memoContent, 1000);
 
   useEffect(() => {
     if (debouncedMemo) {
-      saveMemo(Number(id), debouncedMemo)
-        .then(() => console.log(`노드 ${id}의 메모 저장 성공`))
-        .catch(err => console.error(`메모 저장 실패:`, err));
+        // saveMemo는 실제 백엔드가 없으면 에러가 발생하므로, 테스트 시에는 주석 처리하거나 dummy 함수로 교체할 수 있습니다.
+        // saveMemo(Number(id), debouncedMemo)
+        //   .then(() => console.log(`노드 ${id}의 메모 저장 성공`))
+        //   .catch(err => console.error(`메모 저장 실패:`, err));
+        console.log(`[DUMMY SAVE] 노드 ${id}에 메모 저장: ${debouncedMemo}`);
     }
   }, [debouncedMemo, id]);
 
@@ -43,7 +45,8 @@ function TxtNode({ id, data }: NodeProps<{ label: string }>) {
     setIsLoading(true);
     setSuggestion('');
     try {
-      const result = await getAiSuggestion(Number(id));
+      // [수정] 실제 API 대신 더미 함수 호출
+      const result = await getAiSuggestionDummy(Number(id));
       setSuggestion(result.content);
     } catch (error) {
       console.error('AI 제안 받기 실패:', error);
@@ -62,13 +65,11 @@ function TxtNode({ id, data }: NodeProps<{ label: string }>) {
     <div
       className={cn(
         "w-72 bg-white rounded-lg shadow-lg border transition-all duration-300",
-        // '중요' 상태일 때의 스타일
         isImportant ? 'border-yellow-400 border-2 shadow-xl' : 'border-gray-200'
       )}
     >
       <Handle type="target" position={Position.Top} className="!bg-stone-500" />
       
-      {/* 노드 헤더 수정 */}
       <div className={cn(
         "p-3 rounded-t-lg border-b flex items-center justify-between",
         isImportant ? 'bg-yellow-50' : 'bg-gray-50'

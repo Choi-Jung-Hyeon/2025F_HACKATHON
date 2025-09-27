@@ -8,7 +8,7 @@ const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
 export const postNewProject = async (prompt: string) => {
   try {
-    const response = await fetch(`${API_BASE_URL}/api/v1/projects/add`, { // 요청을 보낼 API 경로
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/projects/add`, { // 요청을 보낼 API 경로
       method: 'POST', // 요청 방식
       headers: {
         'Content-Type': 'application/json', // 본문이 JSON 형식임을 명시

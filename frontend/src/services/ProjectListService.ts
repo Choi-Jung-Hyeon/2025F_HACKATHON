@@ -12,7 +12,7 @@ const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
  */
 export const getProjects = async (): Promise<Project[]> => {
   try {
-    const response = await fetch(`${API_BASE_URL}/api/v1/projects/info`, {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/projects/info`, {
       cache: 'no-store', // 항상 최신 데이터를 가져오기 위해 캐시 사용 안 함
     });
 
