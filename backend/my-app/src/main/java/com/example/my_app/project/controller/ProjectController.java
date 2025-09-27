@@ -18,14 +18,14 @@ public class ProjectController {
     private final ProjectRepository projectRepository;
 
 
-    @GetMapping("/api/v1/projects/info")
+    @GetMapping("/info")
     public ResponseEntity<List<Project>> getAllProjects() {
         List<Project> projects = projectRepository.findAll();
         return ResponseEntity.ok(projects);
     }
 
 
-    @GetMapping("/api/v1/projects/{id}") 
+    @GetMapping("/{id}") 
     public ResponseEntity<Project> getProjectById(@PathVariable Long id) {
         return projectRepository.findById(id)
                 .map(ResponseEntity::ok)
