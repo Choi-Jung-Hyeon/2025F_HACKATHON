@@ -12,6 +12,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import java.util.concurrent.ThreadLocalRandom;
 
 import com.example.my_app.node.domain.Node;
 import com.example.my_app.node.service.NodeService;
@@ -58,4 +61,39 @@ public class NodeController {
         return ResponseEntity.ok(suggestion);
     }
 
+
+    // 1. 노드를 클릭해서 새로 만드는 경우  2. 노드 여러개를 클릭해 만드는 경우(병합 -> parent를 root로 설정해야함)
+    @PostMapping("/projects/nodes/keywords")
+    public ResponseEntity<List<String>> createNodeAndKeywords(@RequestBody List<Long> id) {
+        //id에 해당하는 노드(들))의 keyword들을 조합해 2개의 키워드 뽑아내기
+        ArrayList<String> keywords = new ArrayList<String>();
+        for (Long x : id){
+            keywords.add(nodeService.getCurrentNodeText(x));
+        }
+
+        //원래는 llm에게 물어 연관성 있는 키워드를 뽑아야하지만, 현재 하드코딩으로 대체 
+        List<String> dummyKeywords = Arrays.asList("AI", "Data", "Visualization", "Machine Learning", "Cloud", "Backend");
+        Collections.shuffle(dummyKeywords);
+        String keyword1 = dummyKeywords.get(0);
+        String keyword2 = dummyKeywords.get(1);
+
+        // 그리고 뽑아낸 키워드로 노드 두개 만들기. 병합의 경우(len(id) > 1) parent를 root로 설정할 것 
+        Node childNode1 = new Node();
+        childNode1.setText(keyword1);
+        childNode1.setActive(false);
+        //nodeRepository.save(childNode1);
+
+        Node childNode2 = new Node(); // default를 id를 부모로 만들되, 수정하는 방향으로 갈까 
+        childNode2.setText(keyword2);
+        childNode2.setActive(false);
+        //nodeRepository.save(childNode2);
+
+
+        if (Arrays.asList(id).size() > 1 ){
+            Node root = nodeService.getRoot(id.get(0));
+            childNode1.setParent(root);
+            childNode2.setParent(root);
+        }
+        return ResponseEntity.ok(Arrays.asList(keyword1, keyword2));
+    }
 }

@@ -6,7 +6,6 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import jakarta.persistence.*;
 import lombok.*;
-
 import java.util.*;
 
 @Entity
@@ -33,8 +32,6 @@ public class Node {
     @JsonIgnore 
     private List<Node> children = new ArrayList<>();
 
-
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "parent_id")
     private Node parent;
@@ -47,4 +44,12 @@ public class Node {
 
     @Column(name = "is_active")
     private Boolean isActive;  
+
+    public void setText(String text) {
+        this.nodeText = text;
+    }
+
+    public void setActive(boolean bool) {
+        this.isActive = bool;
+    }
 }

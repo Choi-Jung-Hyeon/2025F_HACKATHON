@@ -34,7 +34,19 @@ public class NodeService {
         while (node.getParent() != null) {
             node = node.getParent();
         }
-
         return node.getNodeText();
+    }
+
+
+
+
+    public Node getRoot(Long nodeId){
+        Node node = nodeRepository.findById(nodeId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 노드가 존재하지 않습니다: " + nodeId));
+
+        while (node.getParent() != null) {
+            node = node.getParent();
+        }
+        return node;
     }
 }
