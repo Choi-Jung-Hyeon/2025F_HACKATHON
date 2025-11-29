@@ -1,66 +1,73 @@
-# 생각의 지도 (Mind Map Project)
+# NodeSpark: LLM 기반 아이디어 확장 마인드맵 서비스
 
-'생각의 고립'에서 벗어나 아이디어를 무한히 확장할 수 있도록 돕는 AI 기반 마인드맵 서비스입니다. 사용자가 입력한 핵심 주제를 시작으로, AI가 연관된 하위 주제를 추천하고 아이디어를 시각적으로 정리하며 발전시켜 나갈 수 있도록 지원합니다.
+> **2025 해커톤 프로젝트** (Frontend Lead & System Design)
+> "생각의 고립을 깨고, 무한한 아이디어의 확장을 시각화하다."
 
-이 프로젝트는 2025년 해커톤 출품작입니다.
+## 1. 프로젝트 소개 (Project Overview)
+**NodeSpark**는 사용자의 초기 아이디어를 기반으로 LLM이 연관 키워드를 제안하고, 이를 마인드맵 형태로 시각화하여 사고를 확장해 나가는 서비스입니다.
+단순 텍스트 나열이 아닌, **노드(Node)와 엣지(Edge)로 구성된 그래프 인터페이스**를 통해 사용자가 직관적으로 사고를 구체화할 수 있도록 돕습니다.
 
-## 주요 기능
+* **Key Challenge**: 복잡한 그래프 데이터의 시각화 및 실시간 상호작용 구현
+* **Solution**: 재귀적 컴포넌트 설계와 Canvas API를 활용한 최적화
 
-  - **AI 기반 아이디어 확장**: 사용자가 시작 주제를 입력하면, AI가 관련된 하위 주제들을 자동으로 추천하여 마인드맵을 생성합니다.
-  - **인터랙티브 캔버스**:
-      - 생성된 아이디어 노드를 클릭하여 하위 아이디어를 계속해서 확장해나갈 수 있습니다.
-      - 여러 아이디어를 다중 선택하여 하나의 새로운 아이디어로 '조합'할 수 있습니다.
-      - 사용자가 직접 노드를 추가하거나 삭제하며 자유롭게 생각을 정리할 수 있습니다.
-  - **커스텀 노드 시스템**:
-      - **Root/Child/Txt** 세 가지 타입의 노드로 아이디어의 위계를 시각적으로 구분합니다.
-      - 각 노드를 '중요' 상태로 표시하여 아이디어의 우선순위를 관리할 수 있습니다.
-      - Txt 노드에서는 생각을 기록하는 메모 기능과 AI에게 구체적인 아이디어를 제안받는 기능이 있습니다.
-  - **직관적인 UI/UX**: 깔끔한 시작 페이지와 사용하기 쉬운 캔버스 인터페이스를 제공합니다.
+## 2. 기술 스택 (Tech Stack)
 
-## 기술 스택
+### Frontend
+* **Core**: Next.js 14, TypeScript
+* **Styling**: Tailwind CSS
+* **Visualization**: Custom SVG/Canvas Logic (for Mindmap)
 
-### 🖥️ 프런트엔드 (Frontend)
+### Backend & Infrastructure
+* **Server**: Spring Boot (Java), AWS EC2 (Ubuntu)
+* **Database**: AWS RDS (PostgreSQL), H2 (Local Dev)
+* **DevOps**: GitHub Actions, Vercel
 
-  - **Framework**: Next.js
-  - **Language**: TypeScript
-  - **Styling**: Tailwind CSS
-  - **UI Components**: shadcn/ui
-  - **State Management & Canvas**: React Flow
-  - **Notifications**: Sonner
+## 3. 시스템 아키텍처 & 배포 파이프라인 (Architecture & Deployment)
+단기간의 해커톤이지만, **실제 서비스 가능한 수준의 개발 환경(DX)**을 구축하기 위해 자동화된 배포 파이프라인을 설계했습니다.
 
-### ⚙️ 백엔드 (Backend)
+### 3.1. Infrastructure
+* **AWS EC2**: 백엔드 API 서버 호스팅 (Dockerized Spring Boot Application)
+* **AWS RDS**: 데이터 영속성을 위한 PostgreSQL 운영 (Production 환경)
+* **Local Env**: 개발 생산성을 위해 로컬에서는 H2 DB를 사용하도록 환경 분리
 
-  - **Framework**: Spring Boot
-  - **Language**: Java
-  - **Database**: PostgreSQL (Production), H2 (Development)
-  - **ORM**: Spring Data JPA
+### 3.2. CI/CD Pipeline
+개발자가 비즈니스 로직에만 집중할 수 있도록 GitHub Actions를 통해 배포 과정을 자동화했습니다.
+* **Frontend**: Vercel 연동을 통한 자동 빌드 및 배포
+* **Backend**: Main 브랜치 Push 시 → GitHub Actions 트리거 → EC2 서버 접속 및 최신 코드 배포 → 서비스 자동 재시작
 
-## 실행 방법
+```mermaid
+graph LR
+    A[Developer] -->|Push Main| B(GitHub Repo)
+    B -->|Action Trigger| C{CI/CD Pipeline}
+    C -->|Frontend| D[Vercel Deployment]
+    C -->|Backend| E[AWS EC2 (Spring Boot)]
+    E -->|Connection| F[(AWS RDS)]
+````
 
-### 1\. 프런트엔드 실행
+## 4\. 핵심 기능 (Key Features)
 
-1.  `frontend` 디렉토리로 이동합니다.
-    ```bash
-    cd frontend
-    ```
-2.  필요한 라이브러리를 설치합니다.
-    ```bash
-    pnpm install
-    ```
-3.  `.env.local` 파일을 생성하고 백엔드 서버 주소를 입력합니다.
-    ```
-    NEXT_PUBLIC_API_BASE_URL=http://{백엔드_서버_IP}:{포트}/api/v1
-    ```
-4.  개발 서버를 실행합니다.
-    ```bash
-    pnpm dev
-    ```
-5.  브라우저에서 `http://localhost:3000`으로 접속합니다.
+  * **🔍 AI 기반 아이디어 합성 (Idea Synthesis)**: 선택된 노드의 맥락(Context)을 분석하여 LLM이 새로운 연관 키워드를 생성
+  * **📝 메모 노드 관리**: 각 아이디어 노드에 종속된(Dependency) 상세 메모 생성/수정/삭제 기능
+  * **🌳 재귀적 마인드맵 (Recursive Mindmap)**: 부모-자식 관계를 가진 노드들의 무한 확장 및 편집
+  * **⚡ UX 최적화**: 캔버스 줌/팬(Zoom/Pan), 노드 드래그 앤 드롭 등 데스크탑 애플리케이션 수준의 조작감 제공
 
-### 2\. 백엔드 실행
+## 5\. 데이터베이스 설계 (ERD)
 
-1.  `backend/my-app` 디렉토리로 이동합니다.
-2.  Gradle을 사용하여 프로젝트를 빌드하고 실행합니다.
-    ```bash
-    ./gradlew bootRun
-    ```
+마인드맵의 계층형 데이터를 효율적으로 관리하기 위해 **재귀적 참조(Self-Referencing)** 구조를 적용했습니다.
+
+  * **Project**: 사용자별 마인드맵 프로젝트 관리
+  * **Node**: `parent_id`를 통해 트리 구조 형성, `node_text` 및 `memo_text` 관리
+
+## 6\. API 인터페이스 (API Interface)
+
+  * `POST /api/v1/node`: 아이디어 노드 생성 (LLM 합성 요청 포함)
+  * `DELETE /api/v1/node/:id`: 특정 노드 및 하위 트리(Sub-tree) 일괄 삭제
+  * `GET /api/v1/projects/info`: 프로젝트 전체 그래프 데이터 조회
+
+-----
+
+*Created by Choi Jung Hyeon*
+
+````
+
+---
